@@ -291,8 +291,7 @@ class _List(object):
             if field_type in ['Number', 'Currency']:
                 return float(value)
             elif field_type == 'DateTime':
-                # Need to round datetime object
-                return datetime.strptime(value, '%Y-%m-%d %H:%M:%S').date()
+                return datetime.strptime(value, '%Y-%m-%d %H:%M:%S')
             elif field_type == 'Boolean':
                 if value == '1':
                     return 'Yes'
@@ -308,6 +307,8 @@ class _List(object):
                     return self.users['sp'][value]
                 else:
                     return value.split('#')[1]
+            elif field_type == 'Calculated':
+                return value.split('#')[1]
             else:
                 return value
         except AttributeError:
