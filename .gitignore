@@ -10,4 +10,6 @@
 dist/
 build/
 shareplum.egg-info/
+SharePlum.egg-info/
 docs/_build/
+/.idea
