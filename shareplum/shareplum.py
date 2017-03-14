@@ -3,7 +3,6 @@ from .version import __version__
 from lxml import etree
 import requests
 from datetime import datetime
-import re
 
 from requests_toolbelt import SSLAdapter
 
@@ -306,9 +305,9 @@ class _List(object):
                 if value in self.users['sp']:
                     return self.users['sp'][value]
                 else:
-                    return value.split('#')[1]
+                    return value.split('#',1)[1]
             elif field_type == 'Calculated':
-                return value.split('#')[1]
+                return value.split('#',1)[1]
             else:
                 return value
         except AttributeError:
@@ -603,7 +602,7 @@ class _List(object):
 
 
 class soap(object):
-    """A simple class for building SAOP Requests"""
+    """A simple class for building SOAP Requests"""
     def __init__(self, command):
         self.envelope = None
         self.command = command
