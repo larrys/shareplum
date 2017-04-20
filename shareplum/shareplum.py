@@ -290,6 +290,8 @@ class _List(object):
             if field_type in ['Number', 'Currency']:
                 return float(value)
             elif field_type == 'DateTime':
+                if ";#" in value:
+                    value = value.split('#',1)[1]
                 return datetime.strptime(value, '%Y-%m-%d %H:%M:%S')
             elif field_type == 'Boolean':
                 if value == '1':
