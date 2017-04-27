@@ -161,7 +161,7 @@ class Site(object):
         
         # Parse Response
         if response.status_code == 200:
-            envelope = etree.fromstring(response.text.encode('utf-8'))
+            envelope = etree.fromstring(response.text.encode('utf-8'), parser=etree.XMLParser(huge_tree=True))
             result = envelope[0][0][0].text
             lists = envelope[0][0][1]
             data = []
@@ -198,7 +198,7 @@ class Site(object):
                                    
         # Parse Response
         if response.status_code == 200:
-            envelope = etree.fromstring(response.text.encode('utf-8'))
+            envelope = etree.fromstring(response.text.encode('utf-8'), parser=etree.XMLParser(huge_tree=True))
             listitems = envelope[0][0][0][0][0]
             data = []  
             for row in listitems:
@@ -404,7 +404,8 @@ class _List(object):
 
         # Parse Response
         if response.status_code == 200:
-            envelope = etree.fromstring(response.text.encode('utf-8'))
+
+            envelope = etree.fromstring(response.text.encode('utf-8'), parser=etree.XMLParser(huge_tree=True))
             listitems = envelope[0][0][0][0][0]
             data = []  
             for row in listitems:
@@ -437,7 +438,7 @@ class _List(object):
         
         # Parse Response
         if response.status_code == 200:
-            envelope = etree.fromstring(response.text.encode('utf-8'))
+            envelope = etree.fromstring(response.text.encode('utf-8'), parser=etree.XMLParser(huge_tree=True))
             _list = envelope[0][0][0][0]
             info = {key: value for (key,value) in _list.items()}
             for row in _list[0].getchildren():
@@ -483,7 +484,7 @@ class _List(object):
         
         # Parse Response
         if response.status_code == 200:
-            envelope = etree.fromstring(response.text.encode('utf-8'))
+            envelope = etree.fromstring(response.text.encode('utf-8'), parser=etree.XMLParser(huge_tree=True))
             view = envelope[0][0][0][0]
             info = {key: value for (key,value) in view.items()}
             fields = [x.items()[0][1] for x in view[1]]
@@ -512,7 +513,7 @@ class _List(object):
 
         # Parse Response
         if response.status_code == 200:
-            envelope = etree.fromstring(response.text.encode('utf-8'))
+            envelope = etree.fromstring(response.text.encode('utf-8'), parser=etree.XMLParser(huge_tree=True))
             views = envelope[0][0][0][0]
             data = []
             for row in views.getchildren():
@@ -564,7 +565,7 @@ class _List(object):
 
         # Parse Response
         if response.status_code == 200:
-            envelope = etree.fromstring(response.text.encode('utf-8'))
+            envelope = etree.fromstring(response.text.encode('utf-8'), parser=etree.XMLParser(huge_tree=True))
             results = envelope[0][0][0][0]
             data = {}
             for result in results:
@@ -593,7 +594,7 @@ class _List(object):
 
         # Parse Request
         if response.status_code == 200:
-            envelope = etree.fromstring(response.text.encode('utf-8'))
+            envelope = etree.fromstring(response.text.encode('utf-8'), parser=etree.XMLParser(huge_tree=True))
             attaches = envelope[0][0][0][0]
             attachments = []
             for attachment in attaches.getchildren():
