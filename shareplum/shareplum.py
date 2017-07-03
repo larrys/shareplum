@@ -10,13 +10,14 @@ class Site(object):
     """Connect to SharePoint Site
     """
 
-    def __init__(self, site_url, auth=None, verify_ssl=True, ssl_version=None):
+    def __init__(self, site_url, auth=None, verify_ssl=True, ssl_version=None, timeout=None):
         self.site_url = site_url
         self._verify_ssl = verify_ssl
         
         self._session = requests.Session()
         if ssl_version is not None:
             self._session.mount('https://', SSLAdapter(ssl_version))
+        self._timeout = timeout
 
         self._session.headers.update({'user-agent':
                                       'shareplum/%s' % __version__ })
@@ -117,7 +118,8 @@ class Site(object):
         response = self._session.post(url=self._url('Lists'),
                                      headers = self._headers('AddList'),
                                      data = str(soap_request),
-                                     verify = self._verify_ssl)
+                                     verify = self._verify_ssl,
+                                     timeout=self._timeout)
 
         # Parse Request
         if response == 200:
@@ -138,7 +140,8 @@ class Site(object):
         response = self._session.post(url=self._url('Lists'),
                                      headers = self._headers('DeleteList'),
                                      data = str(soap_request),
-                                     verify = self._verify_ssl)
+                                     verify = self._verify_ssl,
+                                     timeout = self._timeout)
 
         # Parse Request
         if response == 200:
@@ -157,7 +160,8 @@ class Site(object):
         response = self._session.post(url=self._url('SiteData'),
                                      headers = self._headers('GetListCollection'),
                                      data = str(soap_request),
-                                     verify = self._verify_ssl)
+                                     verify = self._verify_ssl,
+                                     timeout = self._timeout)
         
         # Parse Response
         if response.status_code == 200:
@@ -194,7 +198,8 @@ class Site(object):
         response = self._session.post(url=self._url('Lists'),
                                      headers = self._headers('GetListItems'),
                                      data = str(soap_request),
-                                     verify = self._verify_ssl)    
+                                     verify = self._verify_ssl,
+                                     timeout = self._timeout)
                                    
         # Parse Response
         if response.status_code == 200:
@@ -218,7 +223,7 @@ class Site(object):
            The Lists Web service provides methods for working
            with SharePoint lists, content types, list items, and files.
         """
-        return _List(self._session, listName, self._url, self._verify_ssl, self.users)
+        return _List(self._session, listName, self._url, self._verify_ssl, self.users, self._timeout)
 
 
 class _List(object):
@@ -228,12 +233,13 @@ class _List(object):
        with SharePoint lists, content types, list items, and files.
     """
     
-    def __init__(self, session, listName, url, verify_ssl, users):
+    def __init__(self, session, listName, url, verify_ssl, users, timeout):
         self._session = session
         self.listName = listName
         self._url = url
         self._verify_ssl = verify_ssl
         self.users = users
+        self._timeout = timeout
         
         # List Info
         self.fields = []
@@ -399,7 +405,8 @@ class _List(object):
         response = self._session.post(url=self._url('Lists'),
                                      headers = self._headers('GetListItems'),
                                      data = str(soap_request),
-                                     verify = self._verify_ssl)
+                                     verify = self._verify_ssl,
+                                     timeout = self._timeout)
    
 
         # Parse Response
@@ -434,7 +441,8 @@ class _List(object):
         response = self._session.post(url=self._url('Lists'),
                                      headers = self._headers('GetList'),
                                      data = str(soap_request),
-                                     verify = self._verify_ssl)
+                                     verify = self._verify_ssl,
+                                     timeout = self._timeout)
         
         # Parse Response
         if response.status_code == 200:
@@ -480,7 +488,8 @@ class _List(object):
         response = self._session.post(url=self._url('Views'),
                                      headers = self._headers('GetView'),
                                      data = str(soap_request),
-                                     verify = self._verify_ssl)
+                                     verify = self._verify_ssl,
+                                     timeout = self._timeout)
         
         # Parse Response
         if response.status_code == 200:
@@ -509,7 +518,8 @@ class _List(object):
         response = self._session.post(url=self._url('Views'),
                                      headers = self._headers('GetViewCollection'),
                                      data = str(soap_request),
-                                     verify = self._verify_ssl)
+                                     verify = self._verify_ssl,
+                                     timeout = self._timeout)
 
         # Parse Response
         if response.status_code == 200:
@@ -561,7 +571,8 @@ class _List(object):
         response = self._session.post(url=self._url('Lists'),
                                  headers = self._headers('UpdateListItems'),
                                  data = str(soap_request),
-                                 verify = self._verify_ssl)
+                                 verify = self._verify_ssl,
+                                 timeout = self._timeout)
 
         # Parse Response
         if response.status_code == 200:
@@ -590,7 +601,8 @@ class _List(object):
         response = self._session.post(url=self._url('Lists'),
                                  headers = self._headers('GetAttachmentCollection'),
                                  data = str(soap_request),
-                                 verify = False)
+                                 verify = False,
+                                 timeout = self._timeout)
 
         # Parse Request
         if response.status_code == 200:
