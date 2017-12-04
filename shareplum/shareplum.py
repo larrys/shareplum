@@ -395,7 +395,10 @@ class _List(object):
                         field_ref = etree.SubElement(_type, 'FieldRef')
                         field_ref.set('Name', self._disp_cols[field[1]]['name'])
                         value = etree.SubElement(_type, 'Value')
-                        value.set('Type', self._disp_cols[field[1]]['type'])
+                        field_ref_type = self._disp_cols[field[1]]['type']
+                        value.set('Type', field_ref_type)
+                        if field_ref_type == 'DateTime':
+                            value.set('IncludeTimeValue', 'True')
                         value.text = self._sp_type(field[1], field[2])
             query['Where'] = where
             soap_request.add_query(query)
