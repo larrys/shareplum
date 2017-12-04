@@ -10,7 +10,7 @@ class Site(object):
     """Connect to SharePoint Site
     """
 
-    def __init__(self, site_url, auth=None, verify_ssl=True, ssl_version=None, timeout=None):
+    def __init__(self, site_url, auth=None, verify_ssl=True, ssl_version=None, timeout=None, huge_tree=False):
         self.site_url = site_url
         self._verify_ssl = verify_ssl
         
@@ -24,7 +24,9 @@ class Site(object):
 
         if auth:
             self._session.auth = auth
-        
+
+        self.huge_tree = huge_tree
+
         self.last_request = None
 
         self._services_url = {'Alerts' : '/_vti_bin/Alerts.asmx',
@@ -165,7 +167,7 @@ class Site(object):
         
         # Parse Response
         if response.status_code == 200:
-            envelope = etree.fromstring(response.text.encode('utf-8'), parser=etree.XMLParser(huge_tree=True))
+            envelope = etree.fromstring(response.text.encode('utf-8'), parser=etree.XMLParser())
             result = envelope[0][0][0].text
             lists = envelope[0][0][1]
             data = []
@@ -203,7 +205,7 @@ class Site(object):
                                    
         # Parse Response
         if response.status_code == 200:
-            envelope = etree.fromstring(response.text.encode('utf-8'), parser=etree.XMLParser(huge_tree=True))
+            envelope = etree.fromstring(response.text.encode('utf-8'), parser=etree.XMLParser(huge_tree=self.huge_tree))
             listitems = envelope[0][0][0][0][0]
             data = []  
             for row in listitems:
@@ -223,7 +225,7 @@ class Site(object):
            The Lists Web service provides methods for working
            with SharePoint lists, content types, list items, and files.
         """
-        return _List(self._session, listName, self._url, self._verify_ssl, self.users, self._timeout)
+        return _List(self._session, listName, self._url, self._verify_ssl, self.users, self._timeout, self.huge_tree)
 
 
 class _List(object):
@@ -233,14 +235,15 @@ class _List(object):
        with SharePoint lists, content types, list items, and files.
     """
     
-    def __init__(self, session, listName, url, verify_ssl, users, timeout):
+    def __init__(self, session, listName, url, verify_ssl, users, timeout, huge_tree):
         self._session = session
         self.listName = listName
         self._url = url
         self._verify_ssl = verify_ssl
         self.users = users
         self._timeout = timeout
-        
+        self.huge_tree = huge_tree
+
         # List Info
         self.fields = []
         self.regional_settings = {}
@@ -306,7 +309,7 @@ class _List(object):
                     return 'No'
                 else:
                     return ''
-            elif field_type == 'User':
+            elif field_type in ('User', 'UserMulti'):
                 # Sometimes the User no longer exists or
                 # has a diffrent ID number so we just remove the "123;#"
                 # from the beginning of their name
@@ -411,8 +414,7 @@ class _List(object):
 
         # Parse Response
         if response.status_code == 200:
-
-            envelope = etree.fromstring(response.text.encode('utf-8'), parser=etree.XMLParser(huge_tree=True))
+            envelope = etree.fromstring(response.text.encode('utf-8'), parser=etree.XMLParser(huge_tree=self.huge_tree))
             listitems = envelope[0][0][0][0][0]
             data = []  
             for row in listitems:
@@ -446,7 +448,7 @@ class _List(object):
         
         # Parse Response
         if response.status_code == 200:
-            envelope = etree.fromstring(response.text.encode('utf-8'), parser=etree.XMLParser(huge_tree=True))
+            envelope = etree.fromstring(response.text.encode('utf-8'), parser=etree.XMLParser(huge_tree=self.huge_tree))
             _list = envelope[0][0][0][0]
             info = {key: value for (key,value) in _list.items()}
             for row in _list[0].getchildren():
@@ -493,7 +495,7 @@ class _List(object):
         
         # Parse Response
         if response.status_code == 200:
-            envelope = etree.fromstring(response.text.encode('utf-8'), parser=etree.XMLParser(huge_tree=True))
+            envelope = etree.fromstring(response.text.encode('utf-8'), parser=etree.XMLParser(huge_tree=self.huge_tree))
             view = envelope[0][0][0][0]
             info = {key: value for (key,value) in view.items()}
             fields = [x.items()[0][1] for x in view[1]]
@@ -523,7 +525,7 @@ class _List(object):
 
         # Parse Response
         if response.status_code == 200:
-            envelope = etree.fromstring(response.text.encode('utf-8'), parser=etree.XMLParser(huge_tree=True))
+            envelope = etree.fromstring(response.text.encode('utf-8'), parser=etree.XMLParser(huge_tree=self.huge_tree))
             views = envelope[0][0][0][0]
             data = []
             for row in views.getchildren():
@@ -576,7 +578,7 @@ class _List(object):
 
         # Parse Response
         if response.status_code == 200:
-            envelope = etree.fromstring(response.text.encode('utf-8'), parser=etree.XMLParser(huge_tree=True))
+            envelope = etree.fromstring(response.text.encode('utf-8'), parser=etree.XMLParser(huge_tree=self.huge_tree))
             results = envelope[0][0][0][0]
             data = {}
             for result in results:
@@ -606,7 +608,7 @@ class _List(object):
 
         # Parse Request
         if response.status_code == 200:
-            envelope = etree.fromstring(response.text.encode('utf-8'), parser=etree.XMLParser(huge_tree=True))
+            envelope = etree.fromstring(response.text.encode('utf-8'), parser=etree.XMLParser(huge_tree=self.huge_tree))
             attaches = envelope[0][0][0][0]
             attachments = []
             for attachment in attaches.getchildren():
